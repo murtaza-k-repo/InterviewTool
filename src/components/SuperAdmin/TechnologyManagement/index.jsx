@@ -35,6 +35,7 @@ const TechnologyManagement = () => {
     technology_name: "",
   });
   const [searched, setSearched] = useState("");
+  
   const classes = useStyles();
 
   const getAllDepartments = async () => {

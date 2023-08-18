@@ -1,3 +1,3 @@
-.judgementTable tr td button{
-    padding: 0 5px;
+.MuiTablePagination-toolbar{
+    align-items: baseline !important;
 }

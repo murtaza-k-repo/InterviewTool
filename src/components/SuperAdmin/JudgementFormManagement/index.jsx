@@ -1,13 +1,86 @@
-
-import React from "react";
-import { Button, Card, Form, Table } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Card, Form, Modal, Table } from "react-bootstrap";
 import sampleFile from "../../../assets/files/sampleCategorySheet.xls";
 import { BiSolidPencil } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
-import "./style.css"
+import MUIDataTable from "mui-datatables";
+import "./style.css";
 
 const JudgementFormManagement = () => {
+  const [showViewForm, setShowViewForm] = useState(false);
+
+  const columns = [
+    {
+      name: "sno",
+      label: "S.No.",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "experience",
+      label: "Experience",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "technology",
+      label: "Technology",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "createdBy",
+      label: "Created By",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "actions",
+      label: "Actions",
+      options: {
+        filter: true,
+        sort: false,
+      },
+    },
+  ];
+
+  const data = [
+    {
+      sno: "1",
+      experience: "1-2 years",
+      technology: "ReactJs",
+      createdBy: "SuperAdmin",
+      actions: (
+        <>
+          <Button
+            className="text-secondary"
+            variant="outlined"
+            onClick={() => {
+              setShowViewForm(true);
+            }}
+          >
+            <FaEye size={22} />
+          </Button>
+          <Button className="text-success" variant="outlined">
+            <BiSolidPencil size={22} />
+          </Button>
+          <Button className="text-danger" variant="outlined">
+            <MdDelete size={22} />
+          </Button>
+        </>
+      ),
+    },
+  ];
+
   return (
     <div className="container">
       <div className="row mt-3">
@@ -55,7 +128,7 @@ const JudgementFormManagement = () => {
                     </div>
                     <div className="col-12 col-md-6">
                       <div class="form-group mb-2">
-                        <label for="myfile">Minimum Pass Criteria</label>
+                        <label for="myfile">Minimum Pass Criteria:</label>
                         <input
                           class="form-control"
                           type="text"
@@ -68,7 +141,6 @@ const JudgementFormManagement = () => {
                     <div className="col-12 col-md-6">
                       <div class="form-group mb-2">
                         <label for="myfile">Category Sheet:</label>
-                        
                         <input
                           class="form-control"
                           type="file"
@@ -78,21 +150,19 @@ const JudgementFormManagement = () => {
                         />
                       </div>
                       <small className="text-muted">
-                          Download sample file{" "}
-                          <a
-                            href={sampleFile}
-                            className="text-secondary"
-                            download="categorySheet.xls"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            categorySheet.xls
-                          </a>
-                        </small>
+                        Download sample file{" "}
+                        <a
+                          href={sampleFile}
+                          className="text-secondary"
+                          download="categorySheet.xls"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          categorySheet.xls
+                        </a>
+                      </small>
                     </div>
-                    
                   </div>
-                  
                   <div className="row justify-content-center mt-2 w-100 m-auto">
                     <div className="col-12 col-md-6">
                       <button className="btn addBtn text-white w-100">
@@ -108,11 +178,23 @@ const JudgementFormManagement = () => {
       </div>
       <div className="row mt-3 mb-4">
         <div className="col">
-          <Card>
+          <MUIDataTable
+            title={"Judgement Form List"}
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: false,
+              filter: false,
+              download: false,
+              print: false,
+              viewColumns: false,
+            }}
+          />
+          {/* <Card>
             <Card.Body>
               <Card.Title>Judgement Form List</Card.Title>
-              <hr />
-              <Table borderless className="judgementTable table" responsive>
+              <hr /> */}
+          {/* <Table borderless className="judgementTable table" responsive>
                 <thead className="thead-dark">
                   <tr>
                     <th>S.No.</th>
@@ -129,23 +211,17 @@ const JudgementFormManagement = () => {
                     <td>Table cell</td>
                     <td>Table cell</td>
                     <td>
-                    <>
-                    <Button className="text-secondary" variant="outlined">
-                      <FaEye size={22} />
-                    </Button>
+                      <>
                         <Button
-                          className="text-success"
+                          className="text-secondary"
                           variant="outlined"
-                          // onClick={() => {
-                          //   setShowUpdateModal(true);
-                          //   setUpdateData({
-                          //     id: row._id,
-                          //     first_name: row.first_name,
-                          //     last_name: row.last_name,
-                          //     email: row.email,
-                          //   });
-                          // }}
+                          onClick={() => {
+                            setShowViewForm(true);
+                          }}
                         >
+                          <FaEye size={22} />
+                        </Button>
+                        <Button className="text-success" variant="outlined">
                           <BiSolidPencil size={22} />
                         </Button>
                         <Button className="text-danger" variant="outlined">
@@ -160,23 +236,17 @@ const JudgementFormManagement = () => {
                     <td>Table cell</td>
                     <td>Table cell</td>
                     <td>
-                    <>
-                    <Button className="text-secondary" variant="outlined">
-                      <FaEye size={22} />
-                    </Button>
+                      <>
                         <Button
-                          className="text-success"
+                          className="text-secondary"
                           variant="outlined"
-                          // onClick={() => {
-                          //   setShowUpdateModal(true);
-                          //   setUpdateData({
-                          //     id: row._id,
-                          //     first_name: row.first_name,
-                          //     last_name: row.last_name,
-                          //     email: row.email,
-                          //   });
-                          // }}
+                          onClick={() => {
+                            setShowViewForm(true);
+                          }}
                         >
+                          <FaEye size={22} />
+                        </Button>
+                        <Button className="text-success" variant="outlined">
                           <BiSolidPencil size={22} />
                         </Button>
                         <Button className="text-danger" variant="outlined">
@@ -191,23 +261,17 @@ const JudgementFormManagement = () => {
                     <td>Table cell</td>
                     <td>Table cell</td>
                     <td>
-                    <>
-                    <Button className="text-secondary" variant="outlined">
-                      <FaEye size={22} />
-                    </Button>
+                      <>
                         <Button
-                          className="text-success"
+                          className="text-secondary"
                           variant="outlined"
-                          // onClick={() => {
-                          //   setShowUpdateModal(true);
-                          //   setUpdateData({
-                          //     id: row._id,
-                          //     first_name: row.first_name,
-                          //     last_name: row.last_name,
-                          //     email: row.email,
-                          //   });
-                          // }}
+                          onClick={() => {
+                            setShowViewForm(true);
+                          }}
                         >
+                          <FaEye size={22} />
+                        </Button>
+                        <Button className="text-success" variant="outlined">
                           <BiSolidPencil size={22} />
                         </Button>
                         <Button className="text-danger" variant="outlined">
@@ -217,11 +281,60 @@ const JudgementFormManagement = () => {
                     </td>
                   </tr>
                 </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
+              </Table> */}
+
+          {/* </Card.Body>
+          </Card> */}
         </div>
       </div>
+
+      <Modal show={showViewForm}>
+        <Modal.Header>
+          <Modal.Title>Judgement Form</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div class="row">
+            <div class="col-sm">
+              <label>Technology</label>
+              <h6 id="technology_name">ReactJs</h6>
+            </div>
+            <div class="col-sm">
+              <label>Experience(Years)</label>
+              <h6 id="exp">5+</h6>
+            </div>
+            <div class="col-sm">
+              <label>Created by</label>
+              <h6 id="created_by">SuperAdmin</h6>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div className="col">
+              <label className="mb-2">Category Details</label>
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">S.No</th>
+                    <th scope="col">Category Name</th>
+                    <th scope="col">Weightage</th>
+                  </tr>
+                </thead>
+                <tbody id="category_dts">
+                  <tr>
+                    <th scope="row">1</th>
+                    <td>Technology</td>
+                    <td>5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowViewForm(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
