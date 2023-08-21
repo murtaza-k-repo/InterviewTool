@@ -1,8 +1,72 @@
+import MUIDataTable from "mui-datatables";
 import React from "react";
-import { Card, Form, Table } from "react-bootstrap";
-import { Link, Outlet } from "react-router-dom";
+import { Button, Card, Form } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
+
+  const columns = [
+    {
+      name: "sno",
+      label: "S.No.",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "candidateName",
+      label: "Candidate Name",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "technology",
+      label: "Technology",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "experience",
+      label: "Experience",
+      options: {
+        filter: true,
+        sort: true,
+      },
+    },
+    {
+      name: "hrDecision",
+      label: "HR Decision",
+      options: {
+        filter: true,
+        sort: false,
+      },
+    },
+    {
+      name: "hrName",
+      label: "HR Name",
+      options: {
+        filter: true,
+        sort: false,
+      },
+    },
+  ];
+
+  const data = [
+    {
+      sno: "1",
+      candidateName: "Rahul Soni",
+      technology: "ReactJs",
+      experience: "1-2 years",
+      hrDecision: "Shortlisted",
+      hrName: "Ritika Singh"
+    },
+  ];
+
   return (
     <div className="container">
       <div className="row mt-3">
@@ -110,7 +174,7 @@ const Dashboard = () => {
       </div>
       <div className="row mt-3 mb-4">
         <div className="col">
-          <Card>
+          {/* <Card>
             <Card.Body>
               <Card.Title>Candidates</Card.Title>
               <hr />
@@ -153,7 +217,22 @@ const Dashboard = () => {
                 </tbody>
               </Table>
             </Card.Body>
-          </Card>
+          </Card> */}
+
+         
+
+          <MUIDataTable
+            title={"Candidates List"}
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: false,
+              filter: false,
+              download: false,
+              print: false,
+              viewColumns: false
+            }}
+          />
         </div>
       </div>
     </div>
