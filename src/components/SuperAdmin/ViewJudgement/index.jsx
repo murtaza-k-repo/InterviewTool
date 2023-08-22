@@ -2,19 +2,22 @@ import React from "react";
 import Navbar from "../../../Utils/Navbar";
 import { Card, Table } from "react-bootstrap";
 import { FaArrowLeft } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const ViewJudgement = () => {
+
+    const navigate  = useNavigate();
+
   return (
     <>
       <Navbar />
             <div className="m-3">
-               <Link className="d-flex align-items-center text-decoration-none text-black" to={"/"}><FaArrowLeft size={22} /> <span className="ms-2">Back</span></Link> 
+               <Link className="d-flex align-items-center text-decoration-none text-black" to={navigate(-1)}><FaArrowLeft size={22} /> <span className="ms-2">Back</span></Link> 
             </div>
       <div className="container">
             <div className="row mt-4">
                 <div className="col-4">
-                    <Card>
+                    <Card className="dashboard-card">
                         <Card.Title className="p-3 pb-0">Candidate Information</Card.Title>
                         <hr className="pb-0 mb-0" />
                         <Card.Body>
@@ -50,7 +53,7 @@ const ViewJudgement = () => {
                     </Card>
                 </div>
                 <div className="col-8">
-                <Card className="mb-4">
+                <Card className="mb-4 dashboard-card">
                         <Card.Title className="p-3 pb-0">Result Information</Card.Title>
                         <hr className="pb-0 mb-0" />
                         <Card.Text className="p-3 pb-0 mb-0">

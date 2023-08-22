@@ -1,10 +1,11 @@
 import MUIDataTable from "mui-datatables";
 import React from "react";
 import { Button, Card, Form } from "react-bootstrap";
+import { MdCancel } from "react-icons/md";
 import { Link } from "react-router-dom";
+import "./style.css";
 
 const Dashboard = () => {
-
   const columns = [
     {
       name: "sno",
@@ -63,7 +64,7 @@ const Dashboard = () => {
       technology: "ReactJs",
       experience: "1-2 years",
       hrDecision: "Shortlisted",
-      hrName: "Ritika Singh"
+      hrName: "Ritika Singh",
     },
   ];
 
@@ -71,7 +72,7 @@ const Dashboard = () => {
     <div className="container">
       <div className="row mt-3">
         <div className="col">
-          <Card style={{ width: "100%" }}>
+          <Card className="dashboard-card" style={{ width: "100%" }}>
             <Card.Body>
               <Card.Title>Dashboard</Card.Title>
               <hr />
@@ -104,7 +105,7 @@ const Dashboard = () => {
                 <div className="row mt-4">
                   <div className="col-12 col-md-3">
                     <Link to="/scheduled" className="text-decoration-none">
-                      <Card className="tab-card mb-3 bg-info text-white">
+                      <Card className="tab-card mb-3 bg-c-blue">
                         <Card.Body className="d-flex justify-content-center align-items-center">
                           {" "}
                           <div
@@ -120,7 +121,7 @@ const Dashboard = () => {
                   </div>
                   <div className="col-12 col-md-3">
                     <Link to="/shortlisted" className="text-decoration-none">
-                      <Card className="tab-card mb-3 bg-success text-white">
+                      <Card className="tab-card mb-3 bg-c-green">
                         <Card.Body className="d-flex justify-content-center align-items-center">
                           {" "}
                           <div
@@ -136,7 +137,7 @@ const Dashboard = () => {
                   </div>
                   <div className="col-12 col-md-3">
                     <Link to="/onHold" className="text-decoration-none">
-                      <Card className="tab-card mb-3 bg-warning text-white">
+                      <Card className="tab-card mb-3 bg-c-yellow">
                         <Card.Body className="d-flex justify-content-center align-items-center">
                           {" "}
                           <div
@@ -152,7 +153,7 @@ const Dashboard = () => {
                   </div>
                   <div className="col-12 col-md-3">
                     <Link to="/rejected" className="text-decoration-none">
-                      <Card className="tab-card mb-3 bg-danger text-white">
+                      <Card className="tab-card mb-3 bg-c-pink">
                         <Card.Body className="d-flex justify-content-center align-items-center">
                           {" "}
                           <div
@@ -160,7 +161,8 @@ const Dashboard = () => {
                             style={{ fontWeight: "700", fontSize: "18px" }}
                           >
                             <p>Rejected</p>
-                            <p>{0}</p>
+
+                            <p>0</p>
                           </div>{" "}
                         </Card.Body>
                       </Card>
@@ -219,8 +221,6 @@ const Dashboard = () => {
             </Card.Body>
           </Card> */}
 
-         
-
           <MUIDataTable
             title={"Candidates List"}
             data={data}
@@ -230,7 +230,7 @@ const Dashboard = () => {
               filter: false,
               download: false,
               print: false,
-              viewColumns: false
+              viewColumns: false,
             }}
           />
         </div>
