@@ -11,7 +11,7 @@ import axios from "axios";
 import MUIDataTable from "mui-datatables";
 
 const TechnologyManagement = () => {
-  const [rows, setRows] = useState(null);
+  const [rowData, setRowData] = useState(null);
   const [show, setShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -19,6 +19,9 @@ const TechnologyManagement = () => {
     id: "",
     technology_name: "",
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteID] = useState("");
+
 
   const columns = [
     {
@@ -47,61 +50,163 @@ const TechnologyManagement = () => {
     },
   ];
 
-  const data = [
-    {
-      sno: "1",
-      technology: "ReactJs",
-      actions: (
-        <>
-          <Button
-            className="text-success"
-            variant="outlined"
-            onClick={() => setShowUpdateModal(true)}
-          >
-            <BiSolidPencil size={22} />
-          </Button>
-          <Button className="text-danger" variant="outlined">
-            <MdDelete size={22} />
-          </Button>
-        </>
-      ),
-    },
-    {
-      sno: "2",
-      technology: "NodeJs",
-      actions: (
-        <>
-          <Button
-            className="text-success"
-            variant="outlined"
-            onClick={() => setShowUpdateModal(true)}
-          >
-            <BiSolidPencil size={22} />
-          </Button>
-          <Button className="text-danger" variant="outlined">
-            <MdDelete size={22} />
-          </Button>
-        </>
-      ),
-    },
-  ];
+  // const data = [
+  //   {
+  //     sno: "1",
+  //     technology: "ReactJs",
+  //     actions: (
+  //       <>
+  //         <Button
+  //           className="text-success"
+  //           variant="outlined"
+  //           onClick={() => setShowUpdateModal(true)}
+  //         >
+  //           <BiSolidPencil size={22} />
+  //         </Button>
+  //         <Button className="text-danger" variant="outlined">
+  //           <MdDelete size={22} />
+  //         </Button>
+  //       </>
+  //     ),
+  //   },
+  //   {
+  //     sno: "2",
+  //     technology: "NodeJs",
+  //     actions: (
+  //       <>
+  //         <Button
+  //           className="text-success"
+  //           variant="outlined"
+  //           onClick={() => setShowUpdateModal(true)}
+  //         >
+  //           <BiSolidPencil size={22} />
+  //         </Button>
+  //         <Button className="text-danger" variant="outlined">
+  //           <MdDelete size={22} />
+  //         </Button>
+  //       </>
+  //     ),
+  //   },
+  // ];
+
+  const handleDelete = async (id) =>{
+    try{
+      let response = await axios.delete(`${process.env.REACT_APP_API_ENDPOINT}/api/technology/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+        }
+      });
+
+      if(response.status===200){
+        getAllTechnology();
+        setShowDeleteModal(false);
+      }
+
+    }catch(e){
+      toast.error("Something went wrong!");
+    }
+  }
+
+  const getAllTechnology = async () => {
+    try{
+      setIsLoading(true);
+
+      let response = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/api/technology/getAll`, {
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+        }
+      });
+      if(response.status===200){
+        let data = response?.data?.data?.map((item, index) => ({
+          sno: index+1,
+          technology: item.technology_name,
+          actions: (
+            <>
+              <Button
+                className="text-success"
+                variant="outlined"
+                onClick={() => { setShowUpdateModal(true); setUpdateData({id: item?._id, technology_name: item?.technology_name}) }}
+              >
+                <BiSolidPencil size={22} />
+              </Button>
+              <Button className="text-danger" variant="outlined" onClick={() => { setShowDeleteModal(true); setDeleteID(item?._id)}}>
+                <MdDelete size={22} />
+              </Button>
+            </>
+          )
+        }) );
+
+        setRowData(data);
+        setIsLoading(false)
+      }
+
+    }catch(e){
+      console.log("Error: " + e.message);
+      toast.error("Something went wrong!");
+    }
+  }
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    try{
+
+      let response = await axios.post(`${process.env.REACT_APP_API_ENDPOINT}/api/technology/create`, {
+        technology_name: event.target[0].value
+      }, {
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+        }
+      });
+
+      if(response.status===201){
+        getAllTechnology();
+        setShow(false);
+      }
+
+    }catch(e){
+      toast.error(e.response.data.message);
+    }
+
   };
 
   const handleUpdate = async (event) => {
     event.preventDefault();
+
+    try{
+
+      let response = await axios.put(`${process.env.REACT_APP_API_ENDPOINT}/api/technology/edit/${updateData?.id}`, {
+        technology_name: updateData?.technology_name
+      }, {
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+        }
+      });
+
+      if(response.status===200){
+        getAllTechnology();
+        setShowUpdateModal(false);
+      }
+
+    }catch(e){
+      toast.error(e.response.data.message);
+    }
+
   };
+
+  useEffect(() => {
+    getAllTechnology();
+  }, []);
 
   return (
     <>
       <ToastContainer />
 
       <MUIDataTable
-        className={"mt-4"}
+        className={"mt-4 mb-4"}
         title={"Technology"}
-        data={data}
+        data={rowData || []}
         columns={columns}
         options={{
           selectableRows: false,
@@ -109,6 +214,7 @@ const TechnologyManagement = () => {
           download: false,
           print: false,
           viewColumns: false,
+          responsive: "scroll",
           customToolbar: () => (
             <BiPlus
               onClick={() => setShow(true)}
@@ -184,6 +290,21 @@ const TechnologyManagement = () => {
             </Button>
           </Modal.Footer>
         </Form>
+      </Modal>
+
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={() => handleDelete(deleteId)}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
     </>
   );

@@ -75,6 +75,7 @@ const ActionCard = () => {
         download: false,
         print: false,
         viewColumns: false,
+        responsive: "scroll",
       }}
     />
   );

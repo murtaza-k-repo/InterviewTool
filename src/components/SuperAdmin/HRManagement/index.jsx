@@ -21,6 +21,8 @@ const HRManagement = () => {
     last_name: "",
     email: "",
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteID] = useState("");
 
   const columns = [
     {
@@ -65,56 +67,175 @@ const HRManagement = () => {
     },
   ];
 
-  const data = [
-    {
-      sno: "1",
-      firstName: "Taniya",
-      lastName: "Ahuja",
-      email: "taniya@gmail.com",
-      actions: (
-        <>
-          <Button
-            className="text-success"
-            variant="outlined"
-            onClick={() => setShowUpdateModal(true)}
-          >
-            <BiSolidPencil size={22} />
-          </Button>
-          <Button className="text-danger" variant="outlined">
-            <MdDelete size={22} />
-          </Button>
-        </>
-      ),
-    },
-    {
-      sno: "2",
-      firstName: "Ritika",
-      lastName: "Marothiya",
-      email: "ritika@gmail.com",
-      actions: (
-        <>
-          <Button
-            className="text-success"
-            variant="outlined"
-            onClick={() => setShowUpdateModal(true)}
-          >
-            <BiSolidPencil size={22} />
-          </Button>
-          <Button className="text-danger" variant="outlined">
-            <MdDelete size={22} />
-          </Button>
-        </>
-      ),
-    },
-  ];
+  // const data = [
+  //   {
+  //     sno: "1",
+  //     firstName: "Taniya",
+  //     lastName: "Ahuja",
+  //     email: "taniya@gmail.com",
+  //     actions: (
+  //       <>
+  //         <Button
+  //           className="text-success"
+  //           variant="outlined"
+  //           onClick={() => setShowUpdateModal(true)}
+  //         >
+  //           <BiSolidPencil size={22} />
+  //         </Button>
+  //         <Button className="text-danger" variant="outlined">
+  //           <MdDelete size={22} />
+  //         </Button>
+  //       </>
+  //     ),
+  //   },
+  //   {
+  //     sno: "2",
+  //     firstName: "Ritika",
+  //     lastName: "Marothiya",
+  //     email: "ritika@gmail.com",
+      // actions: (
+      //   <>
+      //     <Button
+      //       className="text-success"
+      //       variant="outlined"
+      //       onClick={() => setShowUpdateModal(true)}
+      //     >
+      //       <BiSolidPencil size={22} />
+      //     </Button>
+      //     <Button className="text-danger" variant="outlined">
+      //       <MdDelete size={22} />
+      //     </Button>
+      //   </>
+      // ),
+  //   },
+  // ];
+
+  const getAllHR = async () => {
+    try {
+      setIsLoading(true);
+
+      let response = await axios.get(
+        `${process.env.REACT_APP_API_ENDPOINT}/hr/getAll`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        let filteredData = response?.data?.data?.filter((item) => !item?.user_is_deleted);
+
+        let data = filteredData?.map((item,index) => ({
+          sno: index+1,
+          firstName: item?.user_first_name,
+          lastName: item?.user_last_name,
+          email: item?.user_email,
+          actions: (
+            <>
+              <Button
+                className="text-success"
+                variant="outlined"
+                onClick={() => {setShowUpdateModal(true); setUpdateData({id: item?._id, first_name: item?.user_first_name, last_name: item?.user_last_name, email: item?.user_email}) }}
+              >
+                <BiSolidPencil size={22} />
+              </Button>
+              <Button className="text-danger" variant="outlined" onClick={() => {
+                  setShowDeleteModal(true);
+                  setDeleteID(item?._id);
+                }}>
+                <MdDelete size={22} />
+              </Button>
+            </>
+          ),
+        }))
+
+        setRows(data);
+        setIsLoading(false);
+      }
+    } catch (e) {
+      console.log("Error: " + e.message);
+      toast.error("Something went wrong!");
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    try {
+      let response = await axios.post(
+        `${process.env.REACT_APP_API_ENDPOINT}/addHr`,
+        {
+          user_first_name: event.target[0].value,
+          user_last_name: event.target[1].value,
+          user_email: event.target[2].value,
+          is_test_user: false,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        getAllHR();
+        setShow(false);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
   };
 
   const handleUpdate = async (event) => {
     event.preventDefault();
+
+    try {
+      let response = await axios.put(
+        `${process.env.REACT_APP_API_ENDPOINT}/hrUpdate/${updateData?.id}`,
+        {
+          user_first_name: updateData?.first_name,
+          user_last_name: updateData?.last_name,
+          user_email: updateData?.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        getAllHR();
+        setShowUpdateModal(false);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
   };
+
+  const handleDelete = async (id) => {
+    try {
+      let response = await axios.delete(
+        `${process.env.REACT_APP_API_ENDPOINT}/hrDelete/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        getAllHR();
+        setShowDeleteModal(false);
+      }
+    } catch (e) {
+      toast.error("Something went wrong!");
+    }
+  };
+
+  useEffect(() => {
+    getAllHR();
+  }, []);
 
   return (
     <>
@@ -123,7 +244,7 @@ const HRManagement = () => {
       <MUIDataTable
         className={"mt-4"}
         title={"Human Resources"}
-        data={data}
+        data={rows || []}
         columns={columns}
         options={{
           selectableRows: false,
@@ -131,6 +252,7 @@ const HRManagement = () => {
           download: false,
           print: false,
           viewColumns: false,
+          responsive: "scroll",
           customToolbar: () => (
             <BiPlus
               onClick={() => setShow(true)}
@@ -247,6 +369,21 @@ const HRManagement = () => {
             </Button>
           </Modal.Footer>
         </Form>
+      </Modal>
+
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={() => handleDelete(deleteId)}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
     </>
   );

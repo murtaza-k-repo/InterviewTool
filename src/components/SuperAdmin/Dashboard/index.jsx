@@ -231,6 +231,7 @@ const Dashboard = () => {
               download: false,
               print: false,
               viewColumns: false,
+              responsive: "scroll",
             }}
           />
         </div>
