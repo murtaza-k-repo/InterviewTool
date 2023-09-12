@@ -3,7 +3,7 @@ import { Button, Card, Form, Modal } from "react-bootstrap";
 import sampleFile from "../../../assets/files/sampleCategorySheet.xls";
 import { BiSolidPencil } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaPlus, FaTrash } from "react-icons/fa";
 import MUIDataTable from "mui-datatables";
 import "./style.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -13,7 +13,11 @@ import axios from "axios";
 const JudgementFormManagement = () => {
   const [viewForm, setViewForm] = useState({
     isShow: false,
-    data: {}
+    data: {},
+  });
+  const [updateForm, setUpdateForm] = useState({
+    isShow: false,
+    data: {},
   });
   const [experienceList, setExperienceList] = useState([]);
   const [technologyList, setTechnologyList] = useState([]);
@@ -123,7 +127,6 @@ const JudgementFormManagement = () => {
         setTechnologyList(response?.data?.data);
       }
     } catch (e) {
-
       toast.error("Something went wrong!");
     }
   };
@@ -139,10 +142,11 @@ const JudgementFormManagement = () => {
         }
       );
       if (response.status === 200) {
-
         let data = response?.data?.data?.map((item, index) => ({
-          sno: index+1,
-          experience: `${item?.experience_details[0]?.experience_level.join('-')} yrs`,
+          sno: index + 1,
+          experience: `${item?.experience_details[0]?.experience_level.join(
+            "-"
+          )} yrs`,
           technology: item?.technology_details[0]?.technology_name,
           createdBy: item?.created_by_details[0]?.user_first_name,
           actions: (
@@ -152,18 +156,41 @@ const JudgementFormManagement = () => {
                 variant="outlined"
                 onClick={() => {
                   let formData = {
+                    id: item?._id,
                     technology: item?.technology_details[0]?.technology_name,
-                    experience: `${item?.experience_details[0]?.experience_level.join('-')} yrs`,
+                    experience: `${item?.experience_details[0]?.experience_level.join(
+                      "-"
+                    )} yrs`,
                     createdBy: item?.created_by_details[0]?.user_first_name,
-                    category_details: item?.category_details
-                  }
-                  setViewForm({ isShow: true, data: formData});
-                  
+                    category_details: item?.category_details,
+                  };
+                  setViewForm({ isShow: true, data: formData });
                 }}
               >
                 <FaEye size={22} />
               </Button>
-              <Button className="text-success" variant="outlined">
+              <Button
+                className="text-success"
+                variant="outlined"
+                onClick={() => {
+                  let formData = {
+                    id: item?._id,
+                    technology_name:
+                      item?.technology_details[0]?.technology_name,
+                    experience: `${item?.experience_details[0]?.experience_level.join(
+                      "-"
+                    )} yrs`,
+                    createdBy: item?.created_by_details[0]?.user_first_name,
+                    technology: item?.category_details?.map(
+                      (detail) => detail?.category_name
+                    ),
+                    weightage: item?.category_details?.map(
+                      (detail) => detail?.category_weightage
+                    ),
+                  };
+                  setUpdateForm({ isShow: true, data: formData });
+                }}
+              >
                 <BiSolidPencil size={22} />
               </Button>
               <Button className="text-danger" variant="outlined">
@@ -171,15 +198,14 @@ const JudgementFormManagement = () => {
               </Button>
             </>
           ),
-        }))
+        }));
 
         setFormsData(data);
       }
     } catch (e) {
-
       toast.error("Something went wrong!");
     }
-  }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -191,23 +217,26 @@ const JudgementFormManagement = () => {
     formData.append("pass_criteria", event.target[2].value);
     formData.append("file", event.target[3].files[0]);
 
-    try{
-
-      let response = await axios.post(`${process.env.REACT_APP_API_ENDPOINT}/api/form/create`, formData, {
-        headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
-          "Content-Type": "multipart/form-data"
+    try {
+      let response = await axios.post(
+        `${process.env.REACT_APP_API_ENDPOINT}/api/form/create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+            "Content-Type": "multipart/form-data",
+          },
         }
-      });
+      );
 
-      if(response.status===201){
+      if (response.status === 201) {
+        event.target.reset();
+        toast.success("Form created successfully!");
         getAllForms();
       }
-
-    }catch(e){
+    } catch (e) {
       toast.error("Something went wrong!");
     }
-
   };
 
   useEffect(() => {
@@ -215,6 +244,43 @@ const JudgementFormManagement = () => {
     getAllTechnology();
     getAllForms();
   }, []);
+
+  const handleAdd = () => {
+    let newData = {
+      ...updateForm,
+      data: {
+        ...updateForm?.data,
+        technology: [...updateForm?.data?.technology, ""],
+        weightage: [...updateForm?.data?.weightage, ""],
+      },
+    };
+
+    setUpdateForm(newData);
+  };
+
+  const handleUpdate = async () => {
+    console.log("update Form", updateForm);
+    try{
+
+      let response = await axios.put(`${process.env.REACT_APP_API_ENDPOINT}/api/form/edit`, {
+        technology: updateForm?.data?.technology,
+        weightage: updateForm?.data?.weightage
+      }, {
+        params: { Id: updateForm?.data?.id},
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+        }
+      });
+
+      if(response.status===200){
+        getAllForms();
+        setUpdateForm({...updateForm, isShow: false});
+      }
+
+    }catch(e){
+      toast.error("Somthing went wrong!");
+    }
+  }
 
   return (
     <>
@@ -237,7 +303,7 @@ const JudgementFormManagement = () => {
                             class="form-control mt-2"
                             required
                           >
-                            <option disabled selected value>
+                            <option selected value={""}>
                               Please select experience
                             </option>
                             {experienceList &&
@@ -257,7 +323,7 @@ const JudgementFormManagement = () => {
                             class="form-control mt-2"
                             required
                           >
-                            <option disabled selected value>
+                            <option selected value={""}>
                               Please select technology
                             </option>
                             {technologyList &&
@@ -338,101 +404,6 @@ const JudgementFormManagement = () => {
                 responsive: "scroll",
               }}
             />
-            {/* <Card>
-            <Card.Body>
-              <Card.Title>Judgement Form List</Card.Title>
-              <hr /> */}
-            {/* <Table borderless className="judgementTable table" responsive>
-                <thead className="thead-dark">
-                  <tr>
-                    <th>S.No.</th>
-                    <th>Experience</th>
-                    <th>Technology</th>
-                    <th>Created By</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>
-                      <>
-                        <Button
-                          className="text-secondary"
-                          variant="outlined"
-                          onClick={() => {
-                            setShowViewForm(true);
-                          }}
-                        >
-                          <FaEye size={22} />
-                        </Button>
-                        <Button className="text-success" variant="outlined">
-                          <BiSolidPencil size={22} />
-                        </Button>
-                        <Button className="text-danger" variant="outlined">
-                          <MdDelete size={22} />
-                        </Button>
-                      </>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>
-                      <>
-                        <Button
-                          className="text-secondary"
-                          variant="outlined"
-                          onClick={() => {
-                            setShowViewForm(true);
-                          }}
-                        >
-                          <FaEye size={22} />
-                        </Button>
-                        <Button className="text-success" variant="outlined">
-                          <BiSolidPencil size={22} />
-                        </Button>
-                        <Button className="text-danger" variant="outlined">
-                          <MdDelete size={22} />
-                        </Button>
-                      </>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>
-                      <>
-                        <Button
-                          className="text-secondary"
-                          variant="outlined"
-                          onClick={() => {
-                            setShowViewForm(true);
-                          }}
-                        >
-                          <FaEye size={22} />
-                        </Button>
-                        <Button className="text-success" variant="outlined">
-                          <BiSolidPencil size={22} />
-                        </Button>
-                        <Button className="text-danger" variant="outlined">
-                          <MdDelete size={22} />
-                        </Button>
-                      </>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table> */}
-
-            {/* </Card.Body>
-          </Card> */}
           </div>
         </div>
 
@@ -467,21 +438,142 @@ const JudgementFormManagement = () => {
                     </tr>
                   </thead>
                   <tbody id="category_dts">
-                   {viewForm?.data?.category_details?.map((detail,index) => (
-                     <tr>
-                     <th scope="row">{index+1}</th>
-                     <td>{detail?.category_name}</td>
-                     <td>{detail?.category_weightage}</td>
-                   </tr>
-                   ))}
-                   
+                    {viewForm?.data?.category_details?.map((detail, index) => (
+                      <tr>
+                        <th scope="row">{index + 1}</th>
+                        <td>{detail?.category_name}</td>
+                        <td>{detail?.category_weightage}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setViewForm({...viewForm, isShow:false})}>
+            <Button
+              variant="secondary"
+              onClick={() => setViewForm({ ...viewForm, isShow: false })}
+            >
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={updateForm?.isShow}>
+          <Modal.Header>
+            <Modal.Title>Edit Form</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div class="row">
+              <div class="col-sm">
+                <label>Technology</label>
+                <h6 id="technology_name">
+                  {updateForm?.data?.technology_name}
+                </h6>
+              </div>
+              <div class="col-sm">
+                <label>Experience</label>
+                <h6 id="exp">{updateForm?.data?.experience}</h6>
+              </div>
+              <div class="col-sm">
+                <label>Created by</label>
+                <h6 id="created_by">{updateForm?.data?.createdBy}</h6>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div className="col">
+                <label className="mb-2">Category Details</label>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">S.No</th>
+                      <th scope="col">Category Name</th>
+                      <th scope="col">Weightage</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="category_dts">
+                    {/* <Form onSubmit={handleUpdate}> */}
+                    {updateForm?.data?.technology?.map((tech, index) => (
+                      <tr>
+                        <th scope="row">{index + 1}</th>
+                        <td>
+                          <Form.Control
+                            type="text"
+                            placeholder="Category Name"
+                            value={tech}
+                            onChange={e => {
+                              let temp = updateForm?.data?.technology;
+                              temp[index] = e.target.value;
+                              
+                              setUpdateForm({
+                                ...updateForm,
+                                data: {
+                                  ...updateForm?.data,
+                                  technology: temp
+                                }
+                              })
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            type="number"
+                            placeholder="Category Weightage"
+                            value={updateForm?.data?.weightage[index]}
+                            onChange={e => {
+                              let temp = updateForm?.data?.weightage;
+                              temp[index] = Number(e.target.value);
+
+                              setUpdateForm({
+                                ...updateForm,
+                                data: {
+                                  ...updateForm?.data,
+                                  weightage: temp
+                                }
+                              });
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <Button variant="outline" className="text-danger" onClick={() => {
+                            let tempTechnology = updateForm?.data?.technology;
+                            let tempWeightage = updateForm?.data?.weightage;
+
+                            tempTechnology.splice(index,1);
+                            tempWeightage.splice(index,1);
+                            setUpdateForm({
+                              ...updateForm,
+                              data: {
+                                ...updateForm?.data,
+                                technology: tempTechnology,
+                                weightage: tempWeightage
+                              }
+                            });
+
+
+                          }} ><FaTrash size={20} /></Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {/* </Form> */}
+                  </tbody>
+                </table>
+                <div className="text-end">
+                  <Button className="btn addBtn" onClick={handleAdd}>
+                    <FaPlus size={20} />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={handleUpdate} className="Btn addBtn">Save</Button>
+            <Button
+              variant="secondary"
+              onClick={() => setUpdateForm({ ...updateForm, isShow: false })}
+            >
               Close
             </Button>
           </Modal.Footer>

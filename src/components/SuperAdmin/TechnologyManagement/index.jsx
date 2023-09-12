@@ -22,6 +22,7 @@ const TechnologyManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteID] = useState("");
 
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const columns = [
     {
@@ -93,7 +94,7 @@ const TechnologyManagement = () => {
     try{
       let response = await axios.delete(`${process.env.REACT_APP_API_ENDPOINT}/api/technology/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
 
@@ -113,7 +114,7 @@ const TechnologyManagement = () => {
 
       let response = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/api/technology/getAll`, {
         headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
       if(response.status===200){
@@ -156,7 +157,7 @@ const TechnologyManagement = () => {
         technology_name: event.target[0].value
       }, {
         headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
 
@@ -166,7 +167,7 @@ const TechnologyManagement = () => {
       }
 
     }catch(e){
-      toast.error(e.response.data.message);
+      toast.error("Somthing went wrong!");
     }
 
   };
@@ -180,7 +181,7 @@ const TechnologyManagement = () => {
         technology_name: updateData?.technology_name
       }, {
         headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
 
@@ -190,7 +191,7 @@ const TechnologyManagement = () => {
       }
 
     }catch(e){
-      toast.error(e.response.data.message);
+      toast.error("Somthing went wrong!");
     }
 
   };

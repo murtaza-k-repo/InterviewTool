@@ -182,7 +182,7 @@ const HRManagement = () => {
         setShow(false);
       }
     } catch (e) {
-      toast.error(e.response.data.message);
+      toast.error("Somthing went wrong!");
     }
   };
 
@@ -209,7 +209,7 @@ const HRManagement = () => {
         setShowUpdateModal(false);
       }
     } catch (e) {
-      toast.error(e.response.data.message);
+      toast.error("Somthing went wrong!");
     }
   };
 

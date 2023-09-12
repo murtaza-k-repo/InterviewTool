@@ -13,7 +13,7 @@ const Routes = () => {
   return (
     <Router>
       <Route path="/" element={<SuperAdmin />}>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/superadmin" element={<Dashboard />} />
         <Route path="/scheduled" element={<ActionCard />} />
         <Route path="/shortlisted" element={<ActionCard />} />
         <Route path="/onHold" element={<ActionCard />} />

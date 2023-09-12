@@ -27,6 +27,8 @@ const InterviewerManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteID] = useState("");
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const columns = [
     {
       name: "sno",
@@ -139,7 +141,7 @@ const InterviewerManagement = () => {
         `${process.env.REACT_APP_API_ENDPOINT}/interviewer/getAll`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+            Authorization: `Bearer ${user?.token}`,
           },
         }
       );
@@ -209,7 +211,7 @@ const InterviewerManagement = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
+            Authorization: `Bearer ${user?.token}`,
           },
         }
       );
@@ -219,7 +221,7 @@ const InterviewerManagement = () => {
         setShow(false);
       }
     } catch (e) {
-      toast.error(e.response.data.message);
+      toast.error("Somthing went wrong!");
     }
   };
 
@@ -237,7 +239,7 @@ const InterviewerManagement = () => {
           end_time: updateData?.end_time,
       }, {
         headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
 
@@ -247,7 +249,7 @@ const InterviewerManagement = () => {
       }
 
     }catch(e){
-      toast.error(e.response.data.message);
+      toast.error("Somthing went wrong!");
     }
   };
 
@@ -255,7 +257,7 @@ const InterviewerManagement = () => {
     try{
       let response = await axios.delete(`${process.env.REACT_APP_API_ENDPOINT}/interviewer/${id}`, {
         headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
 

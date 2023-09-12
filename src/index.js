@@ -15,7 +15,6 @@ import { Provider } from "react-redux";
 //         if(response){
 //             console.log(response);
 //         }
-
 //     }catch (e) {
 //         console.log(e);
 //     }
@@ -25,7 +24,7 @@ import { Provider } from "react-redux";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter basename="/superadmin">
+  <BrowserRouter basename="/">
     <Provider store={store}>
       <Routes />
     </Provider>

@@ -20,8 +20,8 @@ const Sidebar = () => {
   return (
     <div className="container sidebar">
       <ul className="links">
-        <Link to="/">
-          <li className={`d-flex align-items-center ${active === '/' && 'active'}`}>
+        <Link to="/superadmin">
+          <li className={`d-flex align-items-center ${active === '/superadmin' && 'active'}`}>
             <RxDashboard size={30} /> &nbsp; <span className="d-none d-md-inline"> Dashboard</span>
           </li>
         </Link>
